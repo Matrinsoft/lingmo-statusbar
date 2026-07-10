@@ -1,9 +1,9 @@
-#!/usr/bin/make -f
-
-export QT_SELECT=5
+﻿#!/usr/bin/make -f
 
 %:
 	dh $@
 
 override_dh_auto_configure:
-	dh_auto_configure -- -DEMBED_TRANSLATIONS=ON -DBUILD_TESTING=ON
+	dh_auto_configure -- \
+		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
+		-DCMAKE_INSTALL_PREFIX=/usr

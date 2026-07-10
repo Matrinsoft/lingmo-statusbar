@@ -1,11 +1,11 @@
-﻿name: Build
+﻿name: Test
 on:
   push:
     branches: [main, develop]
   pull_request:
     branches: [main]
 jobs:
-  build:
+  test:
     runs-on: ubuntu-24.04
     container: debian:trixie
     steps:
@@ -15,6 +15,8 @@ jobs:
       - name: Install system dependencies
         run: apt-get update -qq && apt-get install -y -qq cmake ninja-build g++ qt6-base-dev
       - name: Configure
-        run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON
       - name: Build
         run: cmake --build build --parallel
+      - name: Run tests
+        run: ctest --test-dir build --output-on-failure

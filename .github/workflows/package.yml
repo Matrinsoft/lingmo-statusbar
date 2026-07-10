@@ -1,0 +1,45 @@
+﻿name: Package
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+jobs:
+  deb:
+    runs-on: ubuntu-24.04
+    container: debian:trixie
+    steps:
+      - name: Install git
+        run: apt-get update -qq && apt-get install -y -qq git
+      - uses: actions/checkout@v4
+      - name: Install system dependencies
+        run: apt-get update -qq && apt-get install -y -qq build-essential cmake ninja-build debhelper dpkg-dev qt6-base-dev
+      - name: Build Debian package
+        run: |
+          dpkg-buildpackage -us -uc -b
+          mkdir -p artifacts
+          mv ../*.deb ../*.buildinfo ../*.changes artifacts/ 2>/dev/null || true
+      - name: Upload .deb
+        uses: actions/upload-artifact@v4
+        with:
+          name: lingmo-statusbar-deb
+          path: artifacts/
+  rpm:
+    runs-on: ubuntu-24.04
+    container: fedora:44
+    steps:
+      - name: Install git
+        run: dnf install -y git
+      - uses: actions/checkout@v4
+      - name: Install system dependencies
+        run: dnf install -y cmake ninja-build rpm-build qt6-qtbase-devel
+      - name: Build RPM
+        run: |
+          mkdir -p /tmp/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+          cd .. && tar czf /tmp/rpmbuild/SOURCES/lingmo-statusbar-1.0.0.tar.gz --transform='s,^lingmo-statusbar,lingmo-statusbar-1.0.0,' lingmo-statusbar
+          cd lingmo-statusbar && cp rpm/lingmo-statusbar.spec /tmp/rpmbuild/SPECS/
+          rpmbuild -ba /tmp/rpmbuild/SPECS/lingmo-statusbar.spec --define "_topdir /tmp/rpmbuild"
+      - name: Upload .rpm
+        uses: actions/upload-artifact@v4
+        with:
+          name: lingmo-statusbar-rpm
+          path: /tmp/rpmbuild/RPMS/**/*.rpm
