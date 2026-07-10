@@ -10,7 +10,7 @@ Build-Depends:
     qt6-declarative-dev,
     qt6-base-dev, qt6-declarative-dev, libkf6windowystem-dev,
 Standards-Version: 4.6.2
-Homepage: https://github.com/lingmo-os/lingmo-statusbar
+Homepage: https://github.com/Matrinsoft/lingmo-statusbar
 Rules-Requires-Root: no
 
 Package: lingmo-statusbar
